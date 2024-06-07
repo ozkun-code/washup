@@ -22,7 +22,8 @@ Route::middleware('auth')->group(function() {
     Route::get('/profile', \App\Livewire\Auth\Profile::class)->name('profile');
     Route::get('/service', \App\Livewire\Service\Index::class)->name('service.index');
     Route::get('/customer', \App\Livewire\Customer\Index::class)->name('customer.index');
-    Route::get('/transaksi', \App\Livewire\Transaksi\index::class)->name('transaksi.index');
+    Route::get('/transaksi', \App\Livewire\Transaksi\Index::class)->name('transaksi.index');
+    Route::get('/voucher', \App\Livewire\Voucher\Index::class)->name('voucher.index');
     Route::get('/transaksi/create', \App\Livewire\Transaksi\Actions::class)->name('transaksi.actions');
 });
 Route::middleware('guest')->group(function() {  

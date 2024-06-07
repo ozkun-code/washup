@@ -73,17 +73,13 @@ public function simpan()
 
     $this->form->store();
 
+    $this->dispatch('reload');
  
-    emotify('success', 'Transaksi berhasil dibuat');
-    return redirect()->route('transaksi.actions');
- 
-    
 }
     public function closeAlert()
     {
         $this->dispatch('reload');
     }
-
 
 
     public function render()
