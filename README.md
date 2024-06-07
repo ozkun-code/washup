@@ -50,19 +50,21 @@ Describe your project
 
 ## :sparkles: Features ##
 
-:heavy_check_mark: Feature 1;\
-:heavy_check_mark: Feature 2;\
-:heavy_check_mark: Feature 3;
+:heavy_check_mark: Kelola Transaksi;\
+:heavy_check_mark: Kelola Service;\
+:heavy_check_mark: Kelola Data Customer;\
+:heavy_check_mark: Kelola Voucher;\
+:heavy_check_mark: Kelola Profile;
 
 ## :rocket: Technologies ##
 
 The following tools were used in this project:
 
-- [Expo](https://expo.io/)
+- [Laravel](https://laravel.com//)
 - [Node.js](https://nodejs.org/en/)
-- [React](https://pt-br.reactjs.org/)
-- [React Native](https://reactnative.dev/)
-- [TypeScript](https://www.typescriptlang.org/)
+- [TailWind css](https://tailwindcss.com//)
+- [Daisy UI](https://daisyui.com//)
+- [PHP](https://www.php.net//)
 
 ## :white_check_mark: Requirements ##
 
@@ -72,18 +74,28 @@ Before starting :checkered_flag:, you need to have [Git](https://git-scm.com) an
 
 ```bash
 # Clone this project
-$ git clone https://github.com/{{YOUR_GITHUB_USERNAME}}/washup-app
+$ git clone https://github.com/ozkun-code/washup.git
 
-# Access
+# Access the project directory
 $ cd washup-app
 
-# Install dependencies
-$ yarn
+# Install PHP dependencies
+$ composer install
+
+# Create a copy of the .env file
+$ cp .env.example .env
+
+# Generate an application key
+$ php artisan key:generate
+
+# Install Node.js dependencies
+$ yarn install
 
 # Run the project
 $ yarn start
 
 # The server will initialize in the <http://localhost:3000>
+
 ```
 
 ## :memo: License ##
@@ -91,7 +103,12 @@ $ yarn start
 This project is under license from MIT. For more details, see the [LICENSE](LICENSE.md) file.
 
 
-Made with :heart: by <a href="https://github.com/{{YOUR_GITHUB_USERNAME}}" target="_blank">{{YOUR_NAME}}</a>
+Made with :heart: by <a href="https://github.com/ozkun-code" target="_blank">{{FAHRUL ROZI}}</a>\
+Made with :heart: by <a href="https://github.com/Moehid23" target="_blank">{{ABDUL MOEHID MUHTADO}}</a>\
+Made with :heart: by <a href="https://github.com/raihanputra23" target="_blank">{{RAIHAN GYMNASTIAR PUTRA}}</a>\
+Made with :heart: by <a href="https://github.com/inaamelia26" target="_blank">{{INA AMELIA}}</a>\
+Made with :heart: by <a href="https://github.com/bayurahardja28" target="_blank">{{BAYU ARYA RAHARDJA}}</a>\
+Made with :heart: by <a href="http://github.com/leomuhsofyan" target="_blank">{{LEO MUHAMMAD SOFYAN}}</a>
 
 &#xa0;
 
