@@ -10,11 +10,12 @@ class ServiceController extends Controller
     use HttpResponses;
 
     public function getAllServices()
-    {
-        
-        $services = Service::all();
+{
+    $services = Service::all()->map(function ($service) {
+        $service->photo = asset('storage/' . $service->photo);
+        return $service;
+    });
 
-     
-        return $this->success($services);
-    }
+    return $this->success($services);
+}
 }
