@@ -14,8 +14,6 @@ class TransaksiController extends Controller
     {
         $transaksi = Transaksi::where('customer_id', $customerId)->get();
 
-
-
         return $this->success($transaksi);
     }
 }
