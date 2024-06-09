@@ -5,6 +5,7 @@ namespace App\Livewire\Forms;
 use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Livewire\Form;
 
 class CustomerForm extends Form
@@ -27,29 +28,56 @@ class CustomerForm extends Form
         $this->user_id = $user->id;
     }
 
-    public function store()
-    {
-        $validate = $this->validate([
-            'name' => 'required',
-            'contact' => 'required',
-            'user_email' => 'required',
-        ]);
+public function store()
+{
+    $validate = $this->validate([
+        'name' => 'required',
+        'contact' => 'required',
+        'user_email' => 'required',
+    ]);
 
-        $user = User::create([
-            'name' => $validate['name'],
-            'email' => $validate['user_email'],
-            'password' => Hash::make('washup'),
-            'role' => 'customer',
-        ]);
+    // Buat password secara acak
+    $randomPassword = Str::random(10);
 
-        Customer::create([
-            'name' => $validate['name'],
-            'contact' => $validate['contact'],
-            'user_id' => $user->id,
-        ]);
+    $user = User::create([
+        'name' => $validate['name'],
+        'email' => $validate['user_email'],
+        'password' => Hash::make($randomPassword),
+        'role' => 'customer',
+    ]);
 
-        $this->reset();
-    }
+    Customer::create([
+        'name' => $validate['name'],
+        'contact' => $validate['contact'],
+        'user_id' => $user->id,
+    ]);
+
+    // Kirim pesan WhatsApp setelah pengguna berhasil didaftarkan
+    $curl = curl_init();
+
+    $message = "Registrasi member Washup Anda berhasil.\nUsername: " . $validate['name'] . "\nPassword: " . $randomPassword . "\nSilahkan ubah password setelah Anda login.";
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://api.fonnte.com/send',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => array('target' => $validate['contact'], 'message' => $message),
+        CURLOPT_HTTPHEADER => array(
+            'Authorization: QpLdLPJWyNtmD-rP9eSo'
+        ),
+    ));
+
+    $response = curl_exec($curl);
+
+    curl_close($curl);
+
+    $this->reset();
+}
 
     public function update()
     {

@@ -60,30 +60,34 @@
                         </tbody>
                     </table>
                 </div>
+
                 <select @class([
                     'select select-bordered',
                     'select-error' => $errors->first('items'),
-                ]) wire:model="form.customer_id" required>
+                ]) wire:model="form.customer_id" wire:change="addVoucher" required>
                     <option value="">Pilih Customer</option>
                     @foreach ($customers as $id => $name)
-                        <option value="{{ $id }}">{{ $name }}</option>
+                        <option value="{{ $id }}">
+                            {{ $name }}</option>
                     @endforeach
                 </select>
-                <textarea rows="3"placeholder="Keterangan Transaksi" @class([
+                <select @class([
+                    'select select-bordered',
+                    'select-error' => $errors->first('vouchers'),
+                ]) wire:model="selectedVoucher" wire:change="applyVoucher" required>
+                    <option value="">Pilih Voucher</option>
+                    @foreach ($voucherNames as $voucher)
+                        <option value="{{ $voucher->id }}">
+                            {{ $voucher->name }}</option>
+                    @endforeach
+                </select>
+
+
+                <textarea rows="3" placeholder="Keterangan Transaksi" @class([
                     'textarea textarea-bordered',
                     'textarea-error' => $errors->first('items'),
                 ]) wire:model="form.description"></textarea>
                 <div class="card-actions justify-between">
-
-                    @if (session()->has('status'))
-                        <div role="alert" class="alert alert-success justify-between">
-                            <x-tabler-checks class="size-5" />
-                            <span class="text-center">{{ session('status') }}</span>
-                            <button class="btn btn-xc btn-square" wire:click="closeAlert">
-                                <x-tabler-file-plus class="size-4" />
-                            </button>
-                        </div>
-                    @endif
                     <div class="flex flex-col">
                         <div class="text-xs">Total harga</div>
                         <div @class(['card-title', 'text-error' => $errors->first('items')])>Rp.

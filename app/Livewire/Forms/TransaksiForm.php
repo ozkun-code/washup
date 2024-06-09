@@ -12,6 +12,7 @@ class TransaksiForm extends Form
     public $customer_id;
     public $description;
     public $items;
+    public $discount;
     public $price;
     public $status;
     public $created_at;
@@ -26,6 +27,7 @@ class TransaksiForm extends Form
         $this->items = $transaksi->items;
         $this->price = $transaksi->price;
         $this->status = $transaksi->status;
+        $this->discount = $transaksi->discount;
         $this->created_at = $transaksi->created_at;
     }
 
@@ -56,6 +58,7 @@ class TransaksiForm extends Form
             'description' => 'required',
             'items' => 'required',
             'price' => 'required',
+            'discount' => 'required',
         ];
 
         if ($isUpdate) {

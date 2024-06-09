@@ -12,6 +12,7 @@ class Transaksi extends Model
 
     
     protected $fillable = [
+        'discount',
         'customer_id',
         'description',
         'items',
