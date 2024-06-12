@@ -53,15 +53,23 @@ class TransaksiForm extends Form
 
     $this->reset();
 }
-    public function update ()
-    {
-        $validate = $this->validateData(true);
+public function update ()
+{
+    $validate = $this->validateStatus();
 
-        $this->transaksi->update($validate);
-        $this->createStatusLog($this->transaksi->id, $this->status);
+    $this->transaksi->update(['status' => $validate['status']]);
+    $this->createStatusLog($this->transaksi->id, $this->status);
 
-        $this->reset();
-    }
+    $this->reset();
+}
+private function validateStatus()
+{
+    return $this->validate([
+        'status' => 'required',
+    ]);
+}
+
+
 
     private function validateData($isUpdate = false)
     {
