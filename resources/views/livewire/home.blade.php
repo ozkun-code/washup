@@ -50,7 +50,7 @@
             <tbody>
                 @foreach ($datas as $data)
                     <tr>
-                        <td></td>
+                        <td>{{ $no++ }}</td>
                         <td>{{ $data->created_at->format('d M H:i') }}</td>
 
                         <td>{{ $data->description }}</td>

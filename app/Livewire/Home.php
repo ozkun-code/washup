@@ -7,6 +7,7 @@ use Livewire\Component;
 
 class Home extends Component
 {
+    public $no = 1;
     
     protected $listeners = ['reload' => '$refresh'];
     public function render()
