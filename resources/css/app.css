@@ -17,6 +17,9 @@ thead {
 .input-bordered {
     @apply border-2 border-base-300;
 }
+.table-row-bordered-thick td {
+    border-bottom: 2px solid #e5e7eb;
+}
 
 .textarea-error,
 .file-input-error,
