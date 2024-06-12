@@ -4,6 +4,8 @@ namespace App\Livewire\Forms;
 
 use App\Models\StatusLog;
 use App\Models\Transaksi;
+use App\Models\Customer;
+use App\Models\ClaimedVoucher;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -16,6 +18,7 @@ class TransaksiForm extends Form
     public $price;
     public $status;
     public $created_at;
+    public $voucher_id;
     public ?Transaksi $transaksi;
     
     public function setTransaksi(Transaksi $transaksi)
@@ -29,18 +32,27 @@ class TransaksiForm extends Form
         $this->status = $transaksi->status;
         $this->discount = $transaksi->discount;
         $this->created_at = $transaksi->created_at;
+        $this->voucher_id = $transaksi->voucher_id;
     }
 
     public function store ()
-    {
-        $validate = $this->validateData();
+{
+    $validate = $this->validateData();
+    
 
-        $transaksi = Transaksi::create($validate);
-        $this->createStatusLog($transaksi->id, 'dibayar');
-
-        $this->reset();
+    $transaksi = Transaksi::create($validate);
+    $this->createStatusLog($transaksi->id, 'dibayar');
+    $points = floor($this->price / 1000); // 1 point for every Rp 1.000,00 spent
+    $customer = Customer::find($this->customer_id);
+    $customer->points += $points;
+    $customer->save();
+    $claimedVoucher = ClaimedVoucher::find($this->voucher_id);
+    if ($claimedVoucher) {
+        $claimedVoucher->update(['used_at' => now()]);
     }
 
+    $this->reset();
+}
     public function update ()
     {
         $validate = $this->validateData(true);
@@ -58,7 +70,9 @@ class TransaksiForm extends Form
             'description' => 'required',
             'items' => 'required',
             'price' => 'required',
-            'discount' => 'required',
+            'voucher_id' => '',
+            'discount' => '',
+            
         ];
 
         if ($isUpdate) {

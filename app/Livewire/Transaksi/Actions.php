@@ -19,22 +19,28 @@ class Actions extends Component
     public $customerId;
     public $discount = 0;
     public $selectedVoucher;
+    public $voucher_id;
    
+   
+  
     public function addVoucher()
-{
-    $customer = Customer::find($this->form->customer_id);
-
-    if ($customer) {
-        $claimedVouchers = ClaimedVoucher::where('user_id', $customer->user_id)->get();
-
-        foreach ($claimedVouchers as $claimedVoucher) {
-            $voucherName = Voucher::find($claimedVoucher->voucher_id);
-            $this->voucherNames[] = $voucherName;
+    {
+        $customer = Customer::find($this->form->customer_id);
+    
+        if ($customer) {
+            $claimedVouchers = ClaimedVoucher::where('user_id', $customer->user_id)
+                                             ->whereNull('used_at')
+                                             ->get();
+    
+            foreach ($claimedVouchers as $claimedVoucher) {
+                $voucherName = Voucher::find($claimedVoucher->voucher_id);
+                $this->voucherNames[] = $voucherName;
+            }
+        } else {
+            dd('Customer not found');
         }
-    } else {
-        dd('Customer not found');
     }
-}
+
 
  
     public function addItem(Service $service)
@@ -111,6 +117,7 @@ public function getPrice()
 
     $this->form->items = $this->items;
     $this->form->price = $this->getPrice();
+    $this->form->voucher_id = $this->selectedVoucher;
     $this->form->discount = $this->discount;
     $this->form->store();
 

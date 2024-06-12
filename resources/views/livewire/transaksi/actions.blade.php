@@ -74,7 +74,7 @@
                 <select @class([
                     'select select-bordered',
                     'select-error' => $errors->first('vouchers'),
-                ]) wire:model="selectedVoucher" wire:change="applyVoucher" required>
+                ]) wire:model="selectedVoucher" wire:change="applyVoucher">
                     <option value="">Pilih Voucher</option>
                     @foreach ($voucherNames as $voucher)
                         <option value="{{ $voucher->id }}">
