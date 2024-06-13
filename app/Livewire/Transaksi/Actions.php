@@ -29,13 +29,19 @@ class Actions extends Component
     
         if ($customer) {
             $claimedVouchers = ClaimedVoucher::where('user_id', $customer->user_id)
-                                             ->whereNull('used_at')
-                                             ->get();
+                ->whereNull('used_at')
+                ->with('voucher:id,name')
+                ->get();
     
-            foreach ($claimedVouchers as $claimedVoucher) {
-                $voucherName = Voucher::find($claimedVoucher->voucher_id);
-                $this->voucherNames[] = $voucherName;
-            }
+            $this->voucherNames = $claimedVouchers->map(function ($claimedVoucher) {
+                return [
+                    'id' => $claimedVoucher->id,
+                'voucher_id' => $claimedVoucher->voucher->id,
+                'voucher_name' => $claimedVoucher->voucher->name
+                ];
+            })->toArray();
+            
+           
         } else {
             dd('Customer not found');
         }
@@ -61,18 +67,21 @@ class Actions extends Component
         }
     }
     public function applyVoucher()
-{
-    $voucher = Voucher::find($this->selectedVoucher);
-
-    if ($voucher) {
-       
-        $this->discount = $voucher->discount_percent;
-    } else {
-       
-        $this->discount = null;
+    {
+        $claimedVoucher = ClaimedVoucher::find($this->selectedVoucher);
+    
+        if ($claimedVoucher) {
+            $voucher = Voucher::find($claimedVoucher->voucher_id);
+    
+            if ($voucher) {
+                $this->discount = $voucher->discount_percent;
+            } else {
+                $this->discount = null;
+            }
+        } else {
+            $this->discount = null;
+        }
     }
-
-}
 
 public function getPrice()
 {
@@ -114,11 +123,13 @@ public function getPrice()
     $this->validate([
         'items' => 'required',
     ]);
-
+   
+   
     $this->form->items = $this->items;
     $this->form->price = $this->getPrice();
     $this->form->voucher_id = $this->selectedVoucher;
     $this->form->discount = $this->discount;
+
     $this->form->store();
 
     return redirect()->route('transaksi.index');

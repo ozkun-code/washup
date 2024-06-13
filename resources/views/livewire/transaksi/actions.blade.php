@@ -77,8 +77,8 @@
                 ]) wire:model="selectedVoucher" wire:change="applyVoucher">
                     <option value="">Pilih Voucher</option>
                     @foreach ($voucherNames as $voucher)
-                        <option value="{{ $voucher->id }}">
-                            {{ $voucher->name }}</option>
+                        <option value="{{ $voucher['id'] }}">
+                            {{ $voucher['voucher_name'] }}</option>
                     @endforeach
                 </select>
 
