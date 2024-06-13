@@ -43,7 +43,7 @@ class VoucherController extends Controller
                 'claimed_at' => now(),
             ]);
     
-            return $this->success($claimedVoucher);
+            return $this->success($claimedVoucher, 'Voucher has Claimed', 200);
         } else {
             return $this->error(null, 'Not enough points', 400);
         }
