@@ -4,48 +4,52 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Transaksi;
+use App\Models\Customer;
 use App\Traits\HttpResponses;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class TransaksiController extends Controller
 {
     use HttpResponses;
 
+    private function checkAuth($customerId)
+    {
+        $authenticatedUser = Auth::user();
+        $authenticatedCustomerId = Customer::where('user_id', $authenticatedUser->id)->value('id');
+        
+        
+        if ($authenticatedCustomerId != $customerId) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+    }
+
     public function getTransaksiByCustomerId($customerId)
     {
-        $transaksi = Transaksi::where('customer_id', $customerId)->get();
-
-        return $this->success($transaksi);
+        if ($response = $this->checkAuth($customerId)) return $response;
+        return $this->success(Transaksi::where('customer_id', $customerId)->get());
     }
+
     public function getTransaksiById($id)
     {
-        $transaksi = Transaksi::where('id', $id)->get();
-
-        return $this->success($transaksi);
+        return $this->success(Transaksi::where('id', $id)->get());
     }
+
     public function getCompletedTransactions($customerId)
     {
-        // Mengambil transaksi dengan status 'sudah diambil'
-        $completedTransactions = Transaksi::where('customer_id', $customerId)
-                                          ->where('status', 'sudah diambil')
-                                          ->get();
-
-        return $this->success($completedTransactions);
+        if ($response = $this->checkAuth($customerId)) return $response;
+        return $this->success(Transaksi::where('customer_id', $customerId)->where('status', 'sudah diambil')->get());
     }
 
     public function getOngoingTransactions($customerId)
     {
+        if ($response = $this->checkAuth($customerId)) return $response;
         $oneDayAgo = Carbon::now()->subDay();
-
-        // Mengambil transaksi yang statusnya bukan 'sudah diambil' atau
-        // transaksi dengan status 'sudah diambil' yang diperbarui dalam 24 jam terakhir
         $ongoingTransactions = Transaksi::where('customer_id', $customerId)
-                                        ->where('status', '!=', 'sudah diambil')
-                                        ->orWhere(function ($query) use ($oneDayAgo) {
-                                            $query->where('status', 'sudah diambil')
-                                                  ->where('updated_at', '>=', $oneDayAgo);
-                                        })
-                                        ->get();
+            ->where(function ($query) use ($oneDayAgo) {
+                $query->where('status', '!=', 'sudah diambil')
+                      ->orWhere('updated_at', '>=', $oneDayAgo);
+            })->get();
 
         return $this->success($ongoingTransactions);
     }
