@@ -7,9 +7,10 @@ use Livewire\Component;
 
 class Login extends Component
 {
-
+   
     public $email;
     public $password;
+    public $title = "login";
 
     
 
@@ -33,6 +34,6 @@ class Login extends Component
 
     public function render()
     {
-        return view('livewire.auth.login');
+        return view('livewire.auth.login')->with('title', $this->title);
     }
 }
