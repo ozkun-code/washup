@@ -48,6 +48,17 @@ class VoucherController extends Controller
             return $this->error(null, 'Not enough points', 400);
         }
     }
+    public function getClaimedVouchers(Request $request)
+{
+    $userId = $request->user()->id;
+    $claimedVouchers = ClaimedVoucher::where('user_id', $userId)->get();
+
+    if ($claimedVouchers->isEmpty()) {
+        return $this->error(null, 'No claimed vouchers found', 404);
+    }
+
+    return $this->success($claimedVouchers);
+}
 
 }
     

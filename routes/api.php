@@ -24,4 +24,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/transaksi/{customerId}', [TransaksiController::class, 'getTransaksiByCustomerId']);
     Route::get('/resi/{transaksiId}', [ResiController::class, 'getResi']);
     Route::post('/claim-voucher/{voucher}', [VoucherController::class, 'claim']);
+    Route::get('/claimed-vouchers', [VoucherController::class, 'getClaimedVouchers']);
 });
