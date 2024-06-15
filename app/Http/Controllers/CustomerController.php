@@ -37,6 +37,10 @@ class CustomerController extends Controller
             return $this->error('', 'User not found', 404);
         }
 
+        $request->validate([
+            'password' => 'required|confirmed',
+        ]);
+
         $user->password = $request->input('password');
         $user->save();
 
