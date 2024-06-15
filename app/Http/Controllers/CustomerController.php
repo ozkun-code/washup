@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
-use App\Models\User; // Asumsikan Anda memiliki model User
 use App\Models\Customer; // Asumsikan Anda memiliki model Customer
+use App\Models\User;
 
 class CustomerController extends Controller
 {
@@ -24,27 +24,27 @@ class CustomerController extends Controller
         return $this->success($customer);
     }
     public function update(Request $request)
-{
-    $userId = $request->user()->id;
-    $customer = Customer::where('user_id', $userId)->first();
+    {
+        $userId = $request->user()->id;
+        $customer = Customer::where('user_id', $userId)->first();
 
-    if (!$customer) {
-        return $this->error('', 'Customer not found', 404);
+        if (!$customer) {
+            return $this->error('', 'Customer not found', 404);
+        }
+
+        $user = User::find($userId);
+        if (!$user) {
+            return $this->error('', 'User not found', 404);
+        }
+
+        $user->password = $request->input('password');
+        $user->save();
+
+        $customer->name = $request->input('name');
+        $customer->contact = $request->input('contact');
+        $customer->address = $request->input('address');
+        $customer->save();
+
+        return $this->success($customer);
     }
-
-    $user = User::find($userId);
-    if (!$user) {
-        return $this->error('', 'User not found', 404);
-    }
-
-    $user->email = $request->input('email');
-    $user->save();
-
-    $customer->name = $request->input('name');
-    $customer->contact = $request->input('contact');
-    $customer->address = $request->input('address');
-    $customer->save();
-
-    return $this->success($customer);
-}
 }
