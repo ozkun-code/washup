@@ -41,9 +41,10 @@ class AuthController extends Controller
 
                 // Simpan token dan expiret at ke Redis
                 Redis::set('access_token:' . $user->id, $accessToken->plainTextToken);
+                Redis::set('access_token_expiry:' . $user->id, $accessToken->accessToken->expires_at->timestamp);
+                
                 Redis::set('refresh_token:' . $user->id, $refreshToken->plainTextToken);
-                Redis::expireat('access_token:' . $user->id, $accessToken->accessToken->expires_at->timestamp);
-                Redis::expireat('refresh_token:' . $user->id, $refreshToken->accessToken->expires_at->timestamp);
+                Redis::set('refresh_token_expiry:' . $user->id, $refreshToken->accessToken->expires_at->timestamp);
 
                 return response()->json([
                     'message' => 'Login successful',
