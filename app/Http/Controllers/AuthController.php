@@ -7,26 +7,22 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     public function register()
-    {
-        $data = request()->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-        ]);
-        $user = User::create($data);
-        $accessToken = $user->createToken('access_token', [TokenAbility::ACCESS_API->value], Carbon::now()->addMinutes(config('sanctum.ac_expiration')));
-        $refreshToken = $user->createToken('refresh_token', [TokenAbility::REFRESH_TOKEN->value], Carbon::now()->addMinutes(config('sanctum.rt_expiration')));
+{
+    $data = request()->validate([
+        'name' => 'required|string',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:6',
+    ]);
+    User::create($data);
 
-        return [
-            'token' => $accessToken->plainTextToken,
-            'refresh_token' => $refreshToken->plainTextToken,
-        ];
-    }
+    return ['message' => 'Registrasi Anda berhasil.'];
+}
     public function login(Request $request)
     {
         try {
@@ -34,22 +30,28 @@ class AuthController extends Controller
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
-    
+
             // Cari user berdasarkan email
             $user = User::where('email', $credentials['email'])->first();
-    
+
             // Verifikasi password
             if ($user && Hash::check($credentials['password'], $user->password)) {
                 $accessToken = $user->createToken('access_token', [TokenAbility::ACCESS_API->value], Carbon::now()->addMinutes(config('sanctum.ac_expiration')));
                 $refreshToken = $user->createToken('refresh_token', [TokenAbility::REFRESH_TOKEN->value], Carbon::now()->addMinutes(config('sanctum.rt_expiration')));
-    
+
+                // Simpan token dan expiret at ke Redis
+                Redis::set('access_token:' . $user->id, $accessToken->plainTextToken);
+                Redis::set('refresh_token:' . $user->id, $refreshToken->plainTextToken);
+                Redis::expireat('access_token:' . $user->id, $accessToken->accessToken->expires_at->timestamp);
+                Redis::expireat('refresh_token:' . $user->id, $refreshToken->accessToken->expires_at->timestamp);
+
                 return response()->json([
                     'message' => 'Login successful',
                     'access_token' => $accessToken->plainTextToken,
                     'refresh_token' => $refreshToken->plainTextToken,
                 ]);
             }
-    
+
             return response()->json(['message' => 'Invalid credentials'], 401);
         } catch (\Exception $e) {
             return response()->json(['message' => 'An error occurred during the login process'], 500);
