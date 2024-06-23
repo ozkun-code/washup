@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\TokenAbility;
 use App\Models\User;
+use App\Models\Customer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -18,8 +19,26 @@ class AuthController extends Controller
         'name' => 'required|string',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|string|min:6',
+        'contact' => 'required', // Pastikan Anda juga menerima informasi kontak dari request
     ]);
-    User::create($data);
+
+    // Membuat pengguna
+    $user = User::create([
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'password' => Hash::make($data['password']),
+        'role' => 'customer', // Asumsikan setiap pengguna baru adalah pelanggan
+    ]);
+
+    // Membuat entri pelanggan
+    Customer::create([
+        'name' => $data['name'],
+        'contact' => $data['contact'],
+        'user_id' => $user->id,
+    ]);
+
+    // Kirim pesan WhatsApp atau email sebagai notifikasi pendaftaran, jika diperlukan
+    // ...
 
     return ['message' => 'Registrasi Anda berhasil.'];
 }
@@ -36,15 +55,10 @@ class AuthController extends Controller
 
             // Verifikasi password
             if ($user && Hash::check($credentials['password'], $user->password)) {
-                $accessToken = $user->createToken('access_token', [TokenAbility::ACCESS_API->value], Carbon::now()->addMinutes(config('sanctum.ac_expiration')));
+                $accessToken = $user->createToken('access_token', [TokenAbility::ACCESS_TOKEN->value], Carbon::now()->addMinutes(config('sanctum.ac_expiration')));
                 $refreshToken = $user->createToken('refresh_token', [TokenAbility::REFRESH_TOKEN->value], Carbon::now()->addMinutes(config('sanctum.rt_expiration')));
 
-                // Simpan token dan expiret at ke Redis
-                Redis::set('access_token:' . $user->id, $accessToken->plainTextToken);
-                Redis::set('access_token_expiry:' . $user->id, $accessToken->accessToken->expires_at->timestamp);
-                
-                Redis::set('refresh_token:' . $user->id, $refreshToken->plainTextToken);
-                Redis::set('refresh_token_expiry:' . $user->id, $refreshToken->accessToken->expires_at->timestamp);
+              
 
                 return response()->json([
                     'message' => 'Login successful',
@@ -60,7 +74,7 @@ class AuthController extends Controller
     }
     public function refreshToken(Request $request)
     {
-        $accessToken = $request->user()->createToken('access_token', [TokenAbility::ACCESS_API->value], Carbon::now()->addMinutes(config('sanctum.ac_expiration')));
+        $accessToken = $request->user()->createToken('access_token', [TokenAbility::ACCESS_TOKEN->value], Carbon::now()->addMinutes(config('sanctum.ac_expiration')));
         return response(['message' => "Acess Token", 'token' => $accessToken->plainTextToken]);
     }
     public function logout(Request $request)

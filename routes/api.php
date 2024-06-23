@@ -17,7 +17,7 @@ Route::middleware('auth:sanctum', 'check_ability:' . TokenAbility::REFRESH_TOKEN
     Route::get('/refresh-token', [AuthController::class, 'refreshToken']);
 });
 
-Route::middleware('auth:sanctum', 'check_ability:' . TokenAbility::ACCESS_API->value)->group(function () {
+Route::middleware('auth:sanctum', 'check_ability:' . TokenAbility::ACCESS_TOKEN->value)->group(function () {
     Route::get('/transaksi/completed/{customerId}', [TransaksiController::class, 'getCompletedTransactions']);
     Route::get('/vouchers', [VoucherController::class, 'getAll']);
     Route::get('/transaksi/ongoing/{customerId}', [TransaksiController::class, 'getOngoingTransactions']);

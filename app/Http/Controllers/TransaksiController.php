@@ -15,7 +15,9 @@ class TransaksiController extends Controller
 
     private function checkAuth($customerId)
     {
+        
         $authenticatedUser = Auth::user();
+        dd($authenticatedUser);
         $authenticatedCustomerId = Customer::where('user_id', $authenticatedUser->id)->value('id');
         
         
@@ -37,6 +39,7 @@ class TransaksiController extends Controller
 
     public function getCompletedTransactions($customerId)
     {
+        dd($this->checkAuth($customerId));
         if ($response = $this->checkAuth($customerId)) return $response;
         return $this->success(Transaksi::where('customer_id', $customerId)->where('status', 'sudah diambil')->get());
     }

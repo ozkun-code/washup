@@ -9,8 +9,10 @@ class CheckTokenAbility
 {
     public function handle(Request $request, Closure $next, ...$abilities)
     {
+
         foreach ($abilities as $ability) {
             if ($request->user()->tokenCan($ability)) {
+
                 return $next($request);
             }
         }
