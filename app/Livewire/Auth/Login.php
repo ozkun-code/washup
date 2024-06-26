@@ -22,14 +22,10 @@ class Login extends Component
     
         if (!Auth::attempt($valid)) {
             $this->addError('Errors', 'Credentials do not match.');
-        } else {
-            $user = Auth::user();
-            if ($user->role == 'admin' || $user->role == 'owner') {
-                $this->redirect(route('home'),true);
-            } else {
-                $this->addError('Errors', 'You do not have access.');
-            }
+            return;
         }
+    
+        $this->redirect(route('home'), true);
     }
 
     public function render()

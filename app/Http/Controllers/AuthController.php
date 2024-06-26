@@ -57,9 +57,13 @@ class AuthController extends Controller
             if ($user && Hash::check($credentials['password'], $user->password)) {
                 $accessToken = $user->createToken('access_token', [TokenAbility::ACCESS_TOKEN->value], Carbon::now()->addMinutes(config('sanctum.ac_expiration')));
                 $refreshToken = $user->createToken('refresh_token', [TokenAbility::REFRESH_TOKEN->value], Carbon::now()->addMinutes(config('sanctum.rt_expiration')));
+                
+                Redis::set("access_token:{$user->id}", $accessToken->plainTextToken);
+                Redis::set("refresh_token:{$user->id}", $refreshToken->plainTextToken);
+                Redis::set("access_token_ex:{$user->id}", Carbon::now()->addMinutes(config('sanctum.ac_expiration')));
+                Redis::set("refresh_token_ex:{$user->id}", Carbon::now()->addMinutes(config('sanctum.rt_expiration')));
 
-              
-
+                
                 return response()->json([
                     'message' => 'Login successful',
                     'access_token' => $accessToken->plainTextToken,

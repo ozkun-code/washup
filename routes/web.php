@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
    return redirect()->route('login');
 });
-Route::middleware('auth')->group(function() {
+
+Route::middleware(['auth', 'role'])->group(function() {
     Route::get('home', \App\Livewire\Home::class)->name('home');
 
     Route::get('/profile', \App\Livewire\Auth\Profile::class)->name('profile');
