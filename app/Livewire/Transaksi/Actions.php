@@ -50,22 +50,15 @@ class Actions extends Component
 
  
     public function addItem(Service $service)
-    {
-        if (isset($this->items[$service->name])) {
-            $item = $this->items[$service->name];
-            $this->items[$service->name] = [
-                'qty' => $item['qty'] + 1,
-                'price' => $item['price'] + $service->price,
-                'unit' => $service->unit
-            ];
-        } else {
-            $this->items[$service->name] = [
-                'qty' => 1,
-                'price' => $service->price,
-                'unit' => $service->unit
-            ];
-        }
+{
+    $name = $service->name;
+    if (!isset($this->items[$name])) {
+        $this->items[$name] = ['qty' => 0, 'price' => 0, 'unit' => $service->unit];
     }
+
+    $this->items[$name]['qty'] += 1;
+    $this->items[$name]['price'] += $service->price;
+}
     public function applyVoucher()
     {
         $claimedVoucher = ClaimedVoucher::find($this->selectedVoucher);
@@ -94,27 +87,28 @@ public function getPrice()
     return $discountedPrice;
 }
 
-    public function removeItem($key)
-    {
-        $item = $this->items[$key];
-        if ($item['qty'] > 1) {
-            $harga = $item['price'] / $item['qty'];
-            $qtybaru = $item['qty'] - 0.1;
-            $this->items[$key]['qty'] = $qtybaru;
-            $this->items[$key]['price'] = $harga * $qtybaru;
-        } else {
-            unset($this->items[$key]);
-        }
+public function adjustItemQuantity($key, $adjustment)
+{
+    $item = $this->items[$key];
+    $newQty = $item['qty'] + $adjustment;
+    if ($newQty > 0) {
+        $pricePerUnit = $item['price'] / $item['qty'];
+        $this->items[$key]['qty'] = $newQty;
+        $this->items[$key]['price'] = $pricePerUnit * $newQty;
+    } else {
+        unset($this->items[$key]);
     }
+}
 
-    public function plusItem($key)
-    {
-        $item = $this->items[$key];
-        $harga = $item['price'] / $item['qty'];
-        $qtybaru = $item['qty'] + 0.1;
-        $this->items[$key]['qty'] = $qtybaru;
-        $this->items[$key]['price'] = $harga * $qtybaru;
-    }
+public function removeItem($key)
+{
+    $this->adjustItemQuantity($key, -0.1);
+}
+
+public function plusItem($key)
+{
+    $this->adjustItemQuantity($key, 0.1);
+}
 
     public function simpan()
 {

@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Enums\TokenAbility;
 use App\Models\User;
+use App\Models\PersonalAccessToken;
 use App\Models\Customer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
+
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -77,10 +79,27 @@ class AuthController extends Controller
         }
     }
     public function refreshToken(Request $request)
-    {
-        $accessToken = $request->user()->createToken('access_token', [TokenAbility::ACCESS_TOKEN->value], Carbon::now()->addMinutes(config('sanctum.ac_expiration')));
-        return response(['message' => "Acess Token", 'token' => $accessToken->plainTextToken]);
-    }
+{
+    $user = $request->user();
+
+    // Mencari token berdasarkan user_id dan kemampuan 'access_token'
+    PersonalAccessToken::where('tokenable_id', $user->id)
+        ->get()
+        ->each(function ($token) {
+            // Cek jika token memiliki kemampuan 'access_token'
+            if (in_array('access_token', $token->abilities)) {
+                // Hapus token jika cocok
+                $token->delete();
+            }
+        });
+
+    // Membuat token baru
+    $accessToken = $user->createToken('access_token', ['access_token'], Carbon::now()->addMinutes(config('sanctum.ac_expiration')));
+
+    // Mengembalikan response dengan token baru
+    return response(['message' => "Access Token", 'token' => $accessToken->plainTextToken]);
+}
+    
     public function logout(Request $request)
     {
         // Mendapatkan pengguna yang sedang login
