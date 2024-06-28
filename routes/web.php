@@ -28,5 +28,5 @@ Route::middleware(['auth', 'role'])->group(function() {
     Route::get('/transaksi/create', \App\Livewire\Transaksi\Actions::class)->name('transaksi.actions');
 });
 Route::middleware('guest')->group(function() {  
-    Route::get('/login',\App\Livewire\Auth\Login::class)->name('login');
+    Route::get('/login',\App\Livewire\Auth\Login::class)->name('login')->middleware('throttle:3,1');
 });

@@ -9,8 +9,7 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\CustomerController;
 use Illuminate\Support\Facades\Route;
 
-
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:3,1');
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum', 'check_ability:' . TokenAbility::REFRESH_TOKEN->value)->group(function () {
